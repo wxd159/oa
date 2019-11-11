@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nuc.oa.dao.SalaryDao">
+    <resultMap id="salary" type="Salary">
+        <id property="id" column="id" javaType="int"/>
+        <result property="sn" column="sn" javaType="String"/>
+        <result property="name" column="name" javaType="String"/>
+        <result property="times" column="times" javaType="String"/>
+        <result property="baseSalary" column="base_salary" javaType="String"/>
+        <result property="sign_in_number" column="COUNT(sign_in_sn)" javaType="java.lang.Integer"/>
+        <result property="attendance_bonus" column="attendance_bonus" javaType="String"/>
+        <result property="total" column="total" javaType="String"/>
+        <result property="tax" column="tax" javaType="String"/>
+        <result property="pay" column="pay" javaType="String"/>
+    </resultMap>
+
+    <select id="init" resultMap="salary">
+        select e.sn,e.name, e.base_salary,COUNT(sign_in_sn)
+        from employee as e left join sign_in s on e.sn=s.sign_in_sn
+        where s.status="正常" and PERIOD_DIFF(date_format(now(),'%Y%m'),date_format(sign_in_time,'%Y%m'))=1
+        group by e.sn
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="Salary">
+        insert into salary(sn,name,times,base_salary,sign_in_number,attendance_bonus,total,tax,pay)
+        values(#{sn},#{name},#{times},#{baseSalary},#{sign_in_number},#{attendance_bonus},#{total},#{tax},#{pay})
+    </insert>
+</mapper>

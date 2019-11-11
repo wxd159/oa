@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.4//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nuc.oa.dao.LeaveRecordDao">
+    <resultMap id="leave_record" type="LeaveRecord">
+        <id property="id" column="id" javaType="Integer"/>
+        <result property="leaveId" column="leave_id" javaType="Integer"/>
+        <result property="dealSn" column="deal_sn" javaType="String"/>
+        <result property="dealTime" column="deal_time" javaType="java.util.Date"/>
+        <result property="dealWay" column="deal_way" javaType="String"/>
+        <result property="dealResult" column="deal_result" javaType="String"/>
+        <result property="comment" column="comment" javaType="String"/>
+        <association property="dealer" column="next_deal_sn" javaType="Employee">
+            <result property="name" column="ename" javaType="String"/>
+            <result property="post" column="epost" javaType="String"/>
+        </association>
+    </resultMap>
+
+    <insert id="insert" parameterType="LeaveRecord">
+        insert into leave_record(leave_id,deal_sn,deal_time,deal_way,deal_result,comment)
+        values(#{leaveId},#{dealSn},#{dealTime},#{dealWay},#{dealResult},#{comment})
+    </insert>
+
+    <select id="selectByLeave" resultMap="leave_record">
+        select l.*,e.name ename,e.post epost from leave_record l
+        left join employee e on l.deal_sn = e.sn
+        where l.leave_id=#{leaveId} order by l.deal_time;
+    </select>
+
+</mapper>

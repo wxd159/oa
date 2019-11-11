@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.4//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nuc.oa.dao.EmployeeDao">
+
+    <resultMap id="employee" type="Employee">
+        <id property="sn" column="sn" javaType="String"/>
+        <result property="password" column="password" javaType="String"/>
+        <result property="name" column="name" javaType="String"/>
+        <result property="birthday" column="birthday" javaType="String"/>
+        <result property="school" column="school" javaType="String"/>
+        <result property="degree" column="degree" javaType="String"/>
+        <result property="startDate" column="start_date" javaType="java.util.Date"/>
+        <result property="endDate" column="end_date" javaType="java.util.Date"/>
+        <result property="status" column="status" javaType="String"/>
+        <result property="registrantSn" column="registrant_sn" javaType="String"/>
+        <result property="IDCard" column="IDCard" javaType="String"/>
+        <result property="address" column="address" javaType="String"/>
+        <result property="remarks" column="remarks" javaType="String"/>
+
+        <result property="departmentSn" column="department_sn" javaType="String"/>
+        <result property="post" column="post" javaType="String"/>
+        <result property="baseSalary" column="base_salary" javaType="String"/>
+        <result property="attendanceNumber" column="attendanceNumber" javaType="String"/>
+        <result property="attendanceBonus" column="attendanceBonus" javaType="String"/>
+        <result property="totalSalary" column="totalSalary" javaType="String"/>
+        <result property="dateInfo" column="dateInfo" javaType="String"/>
+
+        <association property="department" column="department_sn" javaType="Department">
+            <id property="sn" column="dsn" javaType="String"/>
+            <result property="name" column="dname" javaType="String"/>
+        </association>
+        <association property="registrant" column="registrant_sn" javaType="Employee">
+            <id property="sn" column="esn" javaType="String"/>
+            <result property="name" column="ename" javaType="String"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="salary" type="Salary">
+        <id property="id" column="id" javaType="int"/>
+        <result property="sn" column="sn" javaType="String"/>
+        <result property="name" column="name" javaType="String"/>
+        <result property="times" column="times" javaType="String"/>
+        <result property="baseSalary" column="base_salary" javaType="String"/>
+        <result property="sign_in_number" column="sign_in_number" javaType="java.lang.Integer"/>
+        <result property="attendance_bonus" column="attendance_bonus" javaType="String"/>
+        <result property="total" column="total" javaType="String"/>
+        <result property="tax" column="tax" javaType="String"/>
+        <result property="pay" column="pay" javaType="String"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="Employee">
+        insert into employee values(#{sn},#{password},#{name},#{departmentSn},#{post},#{baseSalary},#{birthday},#{school},#{degree},#{startDate},#{endDate},#{status},#{registrantSn},#{IDCard},#{address},#{remarks})
+    </insert>
+
+    <update id="update" parameterType="Employee">
+        update employee set name=#{name},password=#{password},department_sn=#{departmentSn},post=#{post},base_salary=#{baseSalary},birthday=#{birthday},school=#{school},degree=#{degree},start_date=#{startDate},end_date=#{endDate},status=#{status},registrant_sn=#{registrantSn},IDCard=#{IDCard},address=#{address}
+        where sn=#{sn}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        delete from employee where sn=#{sn}
+    </delete>
+
+    <select id="select" parameterType="String" resultMap="employee">
+        select e1.*,d.sn dsn,d.name dname,e2.name registrant
+        from employee e1
+        left join department d on d.sn=e1.department_sn
+        left join employee e2 ON e1.registrant_sn=e2.sn
+        where e1.sn=#{sn}
+    </select>
+
+    <select id="selectAll" resultMap="employee">
+        select e.*,d.sn dsn,d.name dname from employee e left join department d on d.sn=e.department_sn
+        where e.status = "正常" or e.status = "续约"
+    </select>
+
+    <select id="selectByDepartmentAndPost" resultMap="employee">
+        select e.*,d.sn dsn,d.name dname from employee e left join department d on d.sn=e.department_sn
+        where e.sn is not NULL
+        <if test="dsn!=null">
+            and e.department_sn=#{dsn}
+        </if>
+        <if test="post!=null">
+            and e.post=#{post}
+        </if>
+    </select>
+
+    <select id="selectSalary" parameterType="String" resultMap="salary">
+        select * from salary where sn=#{sn}
+    </select>
+
+    <select id="selectByName" resultMap="employee">
+        select e.*,d.sn dsn,d.name dname from employee e left join department d on d.sn=e.department_sn
+        where e.name=#{name}
+    </select>
+</mapper>

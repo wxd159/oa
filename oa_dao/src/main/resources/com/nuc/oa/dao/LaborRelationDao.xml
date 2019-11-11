@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nuc.oa.dao.LaborRelationDao">
+    <resultMap id="laborRelation" type="LaborRelation">
+        <id property="id" column="id" javaType="int"/>
+        <result property="item" column="item" javaType="String"/>
+        <result property="cause" column="cause" javaType="String"/>
+        <result property="createSn" column="create_sn" javaType="String"/>
+        <result property="createTime" column="create_time" javaType="java.util.Date"/>
+        <result property="nextDealSn" column="next_deal_sn" javaType="String"/>
+        <result property="status" column="status" javaType="String"/>
+        <association property="creater" column="create_sn" javaType="Employee">
+            <result property="name" column="cname" javaType="String"/>
+            <result property="post" column="cpost" javaType="String"/>
+        </association>
+        <association property="dealer" column="next_deal_sn" javaType="Employee">
+            <result property="name" column="dname" javaType="String"/>
+            <result property="post" column="dpost" javaType="String"/>
+        </association>
+    </resultMap>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="LaborRelation">
+        insert into labor_relation(item,cause,create_sn,create_time,next_deal_sn,status) values(#{item},#{cause},#{createSn},#{createTime},#{nextDealSn},#{status})
+    </insert>
+
+    <update id="update" parameterType="LaborRelation">
+        update labor_relation set item=#{item},cause=#{cause},next_deal_sn=#{nextDealSn},status=#{status} where id=#{id}
+    </update>
+
+    <delete id="delete" parameterType="Integer">
+        delete from labor_relation where id=#{id}
+    </delete>
+
+    <select id="select" resultMap="laborRelation" parameterType="Integer">
+        select l.*,ce.name cname,ce.post cpost,d.name dname,d.post dpost
+        from labor_relation l
+        left join employee ce on ce.sn=l.create_sn
+        left join employee d on d.sn=l.next_deal_sn
+        where l.id=#{id}
+    </select>
+
+    <select id="selectByCreateSn" resultMap="laborRelation" parameterType="String">
+        select l.*,ce.name cname,ce.post cpost,d.name dname,d.post dpost
+        from labor_relation l
+        left join employee ce on ce.sn=l.create_sn
+        left join employee d on d.sn=l.next_deal_sn
+        where l.create_sn=#{csn} order by l.create_time desc
+    </select>
+
+    <select id="selectByNextDealSn" resultMap="laborRelation" parameterType="String">
+        select l.*,ce.name cname,ce.post cpost,d.name dname,d.post dpost
+        from labor_relation l
+        left join employee ce on ce.sn=l.create_sn
+        left join employee d on d.sn=l.next_deal_sn
+        where l.next_deal_sn=#{ndsn} order by l.create_time desc
+    </select>
+
+</mapper>
